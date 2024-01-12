@@ -58,9 +58,8 @@ class OAuthSourceSerializer(SourceSerializer):
 
     def validate(self, attrs: dict) -> dict:
         session = get_http_session()
-        source_type = registry.find_type(attrs["provider_type"])
 
-        well_known = attrs.get("oidc_well_known_url") or source_type.oidc_well_known_url
+        well_known = attrs.get("oidc_well_known_url")
         inferred_oidc_jwks_url = None
 
         if well_known and well_known != "":
@@ -78,8 +77,8 @@ class OAuthSourceSerializer(SourceSerializer):
             attrs["profile_url"] = config.get("userinfo_endpoint", "")
             inferred_oidc_jwks_url = config.get("jwks_uri", "")
 
-        # Prefer user-entered URL to inferred URL to default URL
-        jwks_url = attrs.get("oidc_jwks_url") or inferred_oidc_jwks_url or source_type.oidc_jwks_url
+        # Prefer user-entered URL to inferred URL
+        jwks_url = attrs.get("oidc_jwks_url") or inferred_oidc_jwks_url
         if jwks_url and jwks_url != "":
             attrs["oidc_jwks_url"] = jwks_url
             try:
